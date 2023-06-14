@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
 
@@ -6,31 +6,45 @@ const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dispatch = useDispatch();
   const username = useSelector((state: any) => state.username);
+  const [inputUsername, setInputUsername] = useState("");
 
-  const handleButtonClicked = () => {
-    dispatch({ type: "SAVE_USERNAME", payload: username });
+  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputUsername(event.target.value);
   };
 
-  useEffect(() => {
+  const handleButtonClicked = () => {
+    dispatch({ type: "SET_USERNAME", payload: inputUsername });
+    setInputUsername("");
+  };
+
+  const handleCanvasRender = () => {
     const canvas = canvasRef.current;
     if (canvas) {
       const context = canvas.getContext("2d");
       if (context) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = "white";
         context.fillRect(0, 0, canvas.width, canvas.height);
+        context.font = "30px Arial";
+        context.fillStyle = "black";
+        context.fillText(username, 50, 50);
       }
     }
-  }, []);
-
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: "SET_USERNAME", payload: event.target.value });
   };
 
   return (
-    <div>
-      <input type="text" value={username} onChange={handleUsernameChange} />
-      <button onClick={handleButtonClicked}>Print Username</button>
-      <canvas ref={canvasRef} className="canvas" />
+    <div className="container">
+      <h1 className="title">White Page</h1>
+      <div className="input-container">
+        <input
+          type="text"
+          value={inputUsername}
+          onChange={handleUsernameChange}
+          placeholder="Enter your username"
+        />
+        <button onClick={handleButtonClicked}>Save</button>
+      </div>
+      <canvas ref={canvasRef} className="canvas" onLoad={handleCanvasRender} />
     </div>
   );
 };
