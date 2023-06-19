@@ -1,7 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { connect } from "socket.io-client";
+
+const socket = connect("http://localhost:3001");
 
 const CanvasPage: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [receivedUsername, setReceivedUsername] = useState("");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -14,7 +18,18 @@ const CanvasPage: React.FC = () => {
     }
   }, []);
 
-  return <canvas ref={canvasRef} className="canvas" />;
+  useEffect(() => {
+    socket.on("receive_message", (data) => {
+      setReceivedUsername(data.username);
+    });
+  }, [socket]);
+
+  return (
+    <div>
+      <h1>{receivedUsername}</h1>
+      <canvas ref={canvasRef} className="canvas" />
+    </div>
+  );
 };
 
 export default CanvasPage;

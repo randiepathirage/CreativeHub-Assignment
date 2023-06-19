@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import { connect } from "socket.io-client";
+
+const socket = connect("http://localhost:3001");
 
 const UsernameInputPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -10,8 +13,9 @@ const UsernameInputPage: React.FC = () => {
     setUsername(event.target.value);
   };
 
-  const handleNext = () => {
+  const goToCanvas = () => {
     navigate("/canvas");
+    socket.emit("send_message", { username });
   };
 
   return (
@@ -23,7 +27,7 @@ const UsernameInputPage: React.FC = () => {
           onChange={handleUsernameChange}
           placeholder="Enter your username"
         />
-        <button onClick={handleNext}>Next</button>
+        <button onClick={goToCanvas}>Next</button>
       </div>
     </div>
   );
